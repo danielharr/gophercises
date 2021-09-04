@@ -55,13 +55,13 @@ func (q *Quiz) parseQuestionsFile(filePath string) {
 	}
 }
 
-func (q *Quiz) Start() {
-	q.readAnswers()
+func (q *Quiz) Start(r io.Reader) {
+	q.readAnswers(r)
 	q.printCorrectAnswerCount()
 }
 
-func (q *Quiz) readAnswers() {
-	reader := bufio.NewReader(os.Stdin)
+func (q *Quiz) readAnswers(r io.Reader) {
+	reader := bufio.NewReader(r)
 	for _, question := range q.questions {
 		fmt.Printf("Question: %s\n", question.text)
 		fmt.Print("Your answer: ")
@@ -92,5 +92,5 @@ func init() {
 
 func main() {
 	q := NewQuiz(*filePath)
-	q.Start()
+	q.Start(os.Stdin)
 }
