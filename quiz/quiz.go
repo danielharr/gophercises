@@ -67,14 +67,10 @@ func (q *Quiz) Start() {
 			log.Fatal(err)
 		}
 		if question.isCorrect(answer) {
-			q.correctAnswer()
+			q.correctAnswers++
 		}
 	}
 	q.printCorrectAnswerCount()
-}
-
-func (q *Quiz) correctAnswer() {
-	q.correctAnswers++
 }
 
 func (q Quiz) printCorrectAnswerCount() {
