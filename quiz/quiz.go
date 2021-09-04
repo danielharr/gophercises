@@ -39,6 +39,7 @@ func (q *Quiz) parseQuestionsFile(filePath string) {
 	if err != nil {
 		log.Fatalf("cannot open file: %s", filePath)
 	}
+	defer file.Close()
 	buf := bufio.NewReader(file)
 	r := csv.NewReader(buf)
 
