@@ -85,12 +85,10 @@ func (q Quiz) printCorrectAnswerCount() {
 
 var filePath *string
 
-func init() {
+func main() {
 	filePath = flag.String("f", "problems.csv", "Quiz csv file")
 	flag.Parse()
-}
 
-func main() {
 	q := NewQuiz(*filePath)
 	q.Start(os.Stdin)
 }
