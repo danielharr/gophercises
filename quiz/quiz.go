@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 type question struct {
@@ -55,12 +56,23 @@ func (q *Quiz) parseQuestionsFile(filePath string) {
 	}
 }
 
-func (q *Quiz) Start(r io.Reader) {
-	q.readAnswers(r)
+func (q *Quiz) Start(r io.Reader, timeoutSec int) {
+	quizDone := make(chan bool)
+	br := bufio.NewReader(r)
+	fmt.Printf("You have %d seconds. Press enter to start.\n", timeoutSec)
+	br.ReadString('\n')
+	timer := time.NewTimer(time.Duration(timeoutSec) * time.Second)
+	go q.readAnswers(br, quizDone)
+
+	select {
+	case <-timer.C:
+		fmt.Println("\nTime is up!")
+	case <-quizDone:
+	}
 	q.printCorrectAnswerCount()
 }
 
-func (q *Quiz) readAnswers(r io.Reader) {
+func (q *Quiz) readAnswers(r io.Reader, done chan bool) {
 	reader := bufio.NewReader(r)
 	for _, question := range q.questions {
 		fmt.Printf("Question: %s\n", question.text)
@@ -76,6 +88,7 @@ func (q *Quiz) readAnswers(r io.Reader) {
 			q.correctAnswers++
 		}
 	}
+	done <- true
 }
 
 func (q Quiz) printCorrectAnswerCount() {
@@ -87,8 +100,9 @@ var filePath *string
 
 func main() {
 	filePath = flag.String("f", "problems.csv", "Quiz csv file")
+	timeoutSec := flag.Int("t", 30, "Quiz time")
 	flag.Parse()
 
 	q := NewQuiz(*filePath)
-	q.Start(os.Stdin)
+	q.Start(os.Stdin, *timeoutSec)
 }
